@@ -5,10 +5,6 @@
  */
 package pacmanhv;
 
-/**
- *
- * @author ducthien
- */
 public class PacmanHV {
 
     /**
