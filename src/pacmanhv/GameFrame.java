@@ -65,7 +65,7 @@ class GamePanel extends JPanel {
     final int ALIVE = 5;
     final int DEAD = 6;
     final int WIN = 7;
-   
+
     Map1 map;
     int status;
     ArrayFood arrayFood;
@@ -77,12 +77,12 @@ class GamePanel extends JPanel {
 
     //khởi tạo 
     public GamePanel() {
-        
+
         status = ALIVE;
         map = new Map1();
         this.setSize(500, 500);
         arrayFood = new ArrayFood();
-        pacMan = new ImageIcon(this.getClass().getResource("nhung.png")).getImage();
+        pacMan = new ImageIcon(this.getClass().getResource("down.png")).getImage();
         System.out.println("new panel");
     }
 
@@ -90,10 +90,10 @@ class GamePanel extends JPanel {
     @Override
     public void paint(Graphics g) {
         if (status == WIN) {
-            
+
             pacMan = new ImageIcon(this.getClass().getResource("win.jpg")).getImage();
             g.drawImage(pacMan, 0, 0, 500, 500, this);
-            g.setFont(new Font("Arial",Font.BOLD, 50));
+            g.setFont(new Font("Arial", Font.BOLD, 50));
             g.setColor(Color.red);
             g.drawString("Score " + score, 170, 350);
             return;
@@ -116,7 +116,7 @@ class GamePanel extends JPanel {
             g.fillOval(food.x, food.y, 10 * food.score, 10 * food.score);
             g.setColor(Color.red);
         }
-        g.drawImage(pacMan, x - 15, y - 15, 30, 30, this);
+        drawPacMan(g, x, y);
         g.drawString("Score: \n" + score, 10, 160);
     }
 
@@ -198,6 +198,29 @@ class GamePanel extends JPanel {
                 }
                 break;
         }
+
+    }
+
+    private void drawPacMan(Graphics g, int x, int y) {
+        switch (direct) {
+            case DOWN:
+                pacMan = new ImageIcon(this.getClass().getResource("down.png")).getImage();
+                break;
+            case UP:
+                pacMan = new ImageIcon(this.getClass().getResource("up.png")).getImage();
+                break;
+            case LEFT:
+                pacMan = new ImageIcon(this.getClass().getResource("left.png")).getImage();
+                break;
+            case RIGHT:
+                pacMan = new ImageIcon(this.getClass().getResource("right.png")).getImage();
+                break;
+            default:
+                pacMan = new ImageIcon(this.getClass().getResource("right.png")).getImage();
+                break;
+        }
+
+        g.drawImage(pacMan, x - 15, y - 15, 30, 30, this);
 
     }
 }
