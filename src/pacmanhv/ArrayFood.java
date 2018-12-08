@@ -1,16 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pacmanhv;
 
 import java.util.ArrayList;
 
-/**
- *
- * @author ducthien
- */
 public class ArrayFood {
 
     int score = 0;
@@ -45,7 +36,7 @@ public class ArrayFood {
         addNew(1, 23, 2);
         addNew(2, 44, 2);
         addNew(24, 44, 2);
-        addNew(47, 23, 2);
+        addNew(46, 23, 2);
         addNew(46, 44, 2);
         addNew(2, 40, 1);
         addNew(6, 40, 1);
@@ -79,6 +70,7 @@ public class ArrayFood {
         addNew(23, 32, 1);
         addNew(26, 32, 1);
         addNew(29, 32, 1);
+        addNew(29, 19, 1);
         addNew(27, 36, 1);
         addNew(27, 40, 1);
         addNew(27, 44, 1);
@@ -105,6 +97,8 @@ public class ArrayFood {
         addNew(43, 44, 1);
         addNew(47, 40, 1);
 //cot truoc hang sau, kich co
+allFood.clear();
+        addNew(1, 1, 1);
     }
 
     public final void addNew(int i, int j, int score) {
@@ -112,15 +106,35 @@ public class ArrayFood {
                 i,
                 j,
                 score));
-
     }
 
-    void check(int x, int y) {
-        for (int i = 0; i < allFood.size(); i++) {
-
+    int check(int x, int y) {
+        if (allFood.isEmpty()) {
+            return 0;
         }
-    }
+        for (int i = 0; i < allFood.size(); i++) {
+//            Food f = allFood.get(i);
+//            if ((f.x*10 < x + 15 && f.x*10 > x - 15)
+//                    && (f.y*10 < y + 15 && f.y*10 > y - 15)) {
+//                this.allFood.remove(i);
+//                return f.score;
+//            };
 
+            int fs = allFood.get(i).score;
+            int fx = allFood.get(i).x + fs*5;
+            int fy = allFood.get(i).y + fs*5;
+            if ((x - fx) * (x - fx) + (y - fy) * (y - fy) <= (15 + fs*5) * (15 + fs*5)) {
+                allFood.remove(i);
+                System.out.println("fx: " + fx);
+                System.out.println("fy: " + fy);
+                System.out.println("fs: " + fs);
+                System.out.println("x: " + x);
+                System.out.println("y: " + y);
+                return fs;
+            }
+        }
+        return 0;
+    }
 }
 
 class Food {
@@ -130,8 +144,8 @@ class Food {
     int score;
 
     public Food(int x, int y, int score) {
-        this.x = x;
-        this.y = y;
+        this.x = 10 * x;
+        this.y = 10 * y;
         this.score = score;
     }
 

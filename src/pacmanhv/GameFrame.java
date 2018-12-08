@@ -1,22 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pacmanhv;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.*;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
 
-/**
- *
- * @author ducthien
- */
 public class GameFrame extends JFrame implements Runnable, KeyListener {
 
     GamePanel gamePanel;
@@ -31,19 +24,21 @@ public class GameFrame extends JFrame implements Runnable, KeyListener {
         th.start();
     }
 
+    //start game
     @Override
     public void run() {
         while (!false) {
             try {
                 gamePanel.update();
-                gamePanel.repaint();
-                Thread.sleep(10);
+                gamePanel.repaint(); // vẽ lại frame 
+                Thread.sleep(10);// 10 là thời gian delay trước khi vẽ lại
             } catch (InterruptedException ex) {
                 Logger.getLogger(GameFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
 
+    // bộ nhận diện action với phím 
     @Override
     public void keyPressed(KeyEvent e) {
         gamePanel.getAKey(e.getKeyCode());
@@ -59,15 +54,18 @@ public class GameFrame extends JFrame implements Runnable, KeyListener {
 
 }
 
+// màn hình chính của game 
 class GamePanel extends JPanel {
 
+    // các hằng số định nghĩa các trạng thái, phương hướng cho dễ nhìn, dễ đoc 
     final int UP = 1;
     final int DOWN = 2;
     final int LEFT = 3;
     final int RIGHT = 4;
     final int ALIVE = 5;
     final int DEAD = 6;
-
+    final int WIN = 7;
+   
     Map1 map;
     int status;
     ArrayFood arrayFood;
@@ -75,20 +73,33 @@ class GamePanel extends JPanel {
     int x = 250;
     int y = 250;
     int direct = DOWN;
+    int score = 0;
 
+    //khởi tạo 
     public GamePanel() {
+        
         status = ALIVE;
         map = new Map1();
         this.setSize(500, 500);
         arrayFood = new ArrayFood();
         pacMan = new ImageIcon(this.getClass().getResource("nhung.png")).getImage();
+        System.out.println("new panel");
     }
 
-    //hien thi len panel 
+    // hàm vẽ lên frame, FPS = 100 
     @Override
     public void paint(Graphics g) {
-        
-        System.out.println(this.getSize().height+" ---- "+this.getSize().width);
+        if (status == WIN) {
+            
+            pacMan = new ImageIcon(this.getClass().getResource("win.jpg")).getImage();
+            g.drawImage(pacMan, 0, 0, 500, 500, this);
+            g.setFont(new Font("Arial",Font.BOLD, 50));
+            g.setColor(Color.red);
+            g.drawString("Score " + score, 170, 350);
+            return;
+        }
+        g.setColor(Color.white);
+        g.fillRect(0, 0, this.getSize().width, this.getSize().height);
         g.setColor(Color.blue);
         for (int i = 0; i < 50; i++) {
             for (int j = 0; j < 50; j++) {
@@ -97,19 +108,29 @@ class GamePanel extends JPanel {
                 }
             }
         }
-        //draw pacman
-        g.drawImage(pacMan, x - 15, y - 15, 30, 30, this);
 
         //draw foods
         g.setColor(Color.green);
         for (Food food : arrayFood.allFood) {
-            g.fillOval(food.x*10, food.y*10, 10*food.score, 10*food.score);
+            g.setColor(Color.green);
+            g.fillOval(food.x, food.y, 10 * food.score, 10 * food.score);
+            g.setColor(Color.red);
         }
+        g.drawImage(pacMan, x - 15, y - 15, 30, 30, this);
+        g.drawString("Score: \n" + score, 10, 160);
     }
 
-    // di chuyen, cap nhap vi tri 
+    // di chuyen, cap nhap vi tri của pacman 
     public void update() {
-        arrayFood.check(x, y);
+        if (arrayFood.allFood.size() == 0) {
+            status = WIN;
+        }
+        int s = arrayFood.check(x, y); // kiểm tra xem vị trí của pacman có trùng với food nào không 
+        if (s == -1) {
+            status = WIN;
+        } else {
+            score += s;
+        }
         switch (direct) {
             case DOWN:
                 down();
@@ -152,11 +173,12 @@ class GamePanel extends JPanel {
         }
     }
 
+    // lọc những trường hợp không di chuyển được
     void getAKey(int keyCode) {
 
         switch (keyCode) {
             case KeyEvent.VK_UP:
-                if (map.check(x, (y + 500 - 1) % 500)) {
+                if (map.check(x, (y + 500 - 1) % 500)) { // check(x,y) check xem vị trí có thỏa mãn để di chuyển tới không 
                     direct = UP;
                 }
                 break;
