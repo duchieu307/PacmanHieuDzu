@@ -1,5 +1,8 @@
 package pacmanhv;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class MainMenu extends javax.swing.JFrame {
 
     public MainMenu() {
@@ -60,7 +63,12 @@ public class MainMenu extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        new GameFrame().setVisible(true); // new game 
+        try {
+            new GameFrame().setVisible(true); // new game 
+        } catch (Exception ex) {
+            Logger.getLogger(MainMenu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed

@@ -15,24 +15,38 @@ public class GameFrame extends JFrame implements Runnable, KeyListener {
     GamePanel gamePanel;
     Thread th;
 
-    public GameFrame() {
-        setSize(500, 500);
+    public GameFrame() throws Exception {
+        setSize(507, 508);
+        setResizable(false);
         gamePanel = new GamePanel();
         addKeyListener(this);
         add(gamePanel);
         th = new Thread(this);
         th.start();
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e){
+                gamePanel.stopMusic();
+                e.getWindow().dispose();
+            }
+        });
+
     }
 
     //start game
     @Override
     public void run() {
+
         while (!false) {
             try {
                 gamePanel.update();
                 gamePanel.repaint(); // vẽ lại frame 
-                Thread.sleep(10);// 10 là thời gian delay trước khi vẽ lại
-            } catch (InterruptedException ex) {
+                Thread.sleep(7);// 10 là thời gian delay trước khi vẽ lại
+                if (gamePanel.status == gamePanel.WIN) {
+                    break;
+                }
+
+            } catch (Exception ex) {
                 Logger.getLogger(GameFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -74,21 +88,29 @@ class GamePanel extends JPanel {
     int y = 250;
     int direct = DOWN;
     int score = 0;
+    SoundControl sc;
 
     //khởi tạo 
-    public GamePanel() {
-
+    public GamePanel() throws Exception {
+        sc = new SoundControl();
+        sc.play(SoundControl.play);
         status = ALIVE;
         map = new Map1();
         this.setSize(500, 500);
         arrayFood = new ArrayFood();
         pacMan = new ImageIcon(this.getClass().getResource("down.png")).getImage();
         System.out.println("new panel");
+
+    }
+
+    public void stopMusic() {
+        sc.playerWAV.stop();
     }
 
     // hàm vẽ lên frame, FPS = 100 
     @Override
     public void paint(Graphics g) {
+
         if (status == WIN) {
 
             pacMan = new ImageIcon(this.getClass().getResource("win.jpg")).getImage();
@@ -98,7 +120,7 @@ class GamePanel extends JPanel {
             g.drawString("Score " + score, 170, 350);
             return;
         }
-        g.setColor(Color.white);
+        g.setColor(Color.black); // color of background
         g.fillRect(0, 0, this.getSize().width, this.getSize().height);
         g.setColor(Color.blue);
         for (int i = 0; i < 50; i++) {
@@ -110,20 +132,24 @@ class GamePanel extends JPanel {
         }
 
         //draw foods
-        g.setColor(Color.green);
+        g.setColor(Color.yellow);
         for (Food food : arrayFood.allFood) {
-            g.setColor(Color.green);
+            g.setColor(Color.yellow);
             g.fillOval(food.x, food.y, 10 * food.score, 10 * food.score);
-            g.setColor(Color.red);
+
         }
         drawPacMan(g, x, y);
+        g.setColor(Color.red);
         g.drawString("Score: \n" + score, 10, 160);
     }
 
     // di chuyen, cap nhap vi tri của pacman 
-    public void update() {
+    public void update() throws Exception {
         if (arrayFood.allFood.size() == 0) {
             status = WIN;
+            sc.playerWAV.stop();
+            sc.play(SoundControl.win);
+
         }
         int s = arrayFood.check(x, y); // kiểm tra xem vị trí của pacman có trùng với food nào không 
         if (s == -1) {
