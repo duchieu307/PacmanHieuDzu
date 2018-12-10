@@ -25,7 +25,7 @@ public class GameFrame extends JFrame implements Runnable, KeyListener {
         th.start();
         this.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent e){
+            public void windowClosing(WindowEvent e) {
                 gamePanel.stopMusic();
                 e.getWindow().dispose();
             }
@@ -42,7 +42,7 @@ public class GameFrame extends JFrame implements Runnable, KeyListener {
                 gamePanel.update();
                 gamePanel.repaint(); // vẽ lại frame 
                 Thread.sleep(7);// 10 là thời gian delay trước khi vẽ lại
-                if (gamePanel.status == gamePanel.WIN) {
+                if (gamePanel.status != gamePanel.ALIVE) {
                     break;
                 }
 
@@ -83,6 +83,7 @@ class GamePanel extends JPanel {
     Map1 map;
     int status;
     ArrayFood arrayFood;
+    ArrayEnemy arrayEnemy;
     Image pacMan;
     int x = 250;
     int y = 250;
@@ -98,6 +99,7 @@ class GamePanel extends JPanel {
         map = new Map1();
         this.setSize(500, 500);
         arrayFood = new ArrayFood();
+        arrayEnemy = new ArrayEnemy();
         pacMan = new ImageIcon(this.getClass().getResource("down.png")).getImage();
         System.out.println("new panel");
 
@@ -112,7 +114,6 @@ class GamePanel extends JPanel {
     public void paint(Graphics g) {
 
         if (status == WIN) {
-
             pacMan = new ImageIcon(this.getClass().getResource("win.jpg")).getImage();
             g.drawImage(pacMan, 0, 0, 500, 500, this);
             g.setFont(new Font("Arial", Font.BOLD, 50));
@@ -138,6 +139,10 @@ class GamePanel extends JPanel {
             g.fillOval(food.x, food.y, 10 * food.score, 10 * food.score);
 
         }
+        g.setColor(Color.green);
+        for (int i = 0; i < arrayEnemy.allEnemy.size(); i++) {
+            g.fillRect(arrayEnemy.allEnemy.get(i).x, arrayEnemy.allEnemy.get(i).y, 30, 30);
+        }
         drawPacMan(g, x, y);
         g.setColor(Color.red);
         g.drawString("Score: \n" + score, 10, 160);
@@ -150,28 +155,34 @@ class GamePanel extends JPanel {
             sc.playerWAV.stop();
             sc.play(SoundControl.win);
 
-        }
-        int s = arrayFood.check(x, y); // kiểm tra xem vị trí của pacman có trùng với food nào không 
-        if (s == -1) {
-            status = WIN;
+        } else if (arrayEnemy.check(x, y)) {
+            status = DEAD;
+            sc.playerWAV.stop();
+            sc.play(SoundControl.lose);
         } else {
-            score += s;
-        }
-        switch (direct) {
-            case DOWN:
-                down();
-                break;
-            case LEFT:
-                left();
-                break;
-            case UP:
-                up();
-                break;
-            case RIGHT:
-                right();
-                break;
-            default:
-                System.out.println("error");
+            arrayEnemy.update();
+            int s = arrayFood.check(x, y); // kiểm tra xem vị trí của pacman có trùng với food nào không 
+            if (s == -1) {
+                status = WIN;
+            } else {
+                score += s;
+            }
+            switch (direct) {
+                case DOWN:
+                    down();
+                    break;
+                case LEFT:
+                    left();
+                    break;
+                case UP:
+                    up();
+                    break;
+                case RIGHT:
+                    right();
+                    break;
+                default:
+                    System.out.println("error");
+            }
         }
     }
 
