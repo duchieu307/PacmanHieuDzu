@@ -39,11 +39,11 @@ public class GameFrame extends JFrame implements Runnable, KeyListener {
 
         while (!false) {
             try {
-                gamePanel.update();
-                gamePanel.repaint(); // vẽ lại frame 
-                Thread.sleep(7);// 10 là thời gian delay trước khi vẽ lại
-                if (gamePanel.status != gamePanel.ALIVE) {
-                    break;
+
+                if (gamePanel.status == gamePanel.ALIVE) {
+                    gamePanel.update();
+                    gamePanel.repaint(); // vẽ lại frame 
+                    Thread.sleep(7);// 10 là thời gian delay trước khi vẽ lại
                 }
 
             } catch (Exception ex) {
@@ -55,7 +55,21 @@ public class GameFrame extends JFrame implements Runnable, KeyListener {
     // bộ nhận diện action với phím 
     @Override
     public void keyPressed(KeyEvent e) {
-        gamePanel.getAKey(e.getKeyCode());
+        if(e.getKeyCode()==KeyEvent.VK_SPACE){
+            if(gamePanel.status==gamePanel.DEAD){
+                try {
+                    this.setVisible(false);
+                    new GameFrame().setVisible(true);
+                } catch (Exception ex) {
+                    Logger.getLogger(GameFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        try {
+            gamePanel.getAKey(e.getKeyCode());
+        } catch (Exception ex) {
+            Logger.getLogger(GameFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -120,32 +134,40 @@ class GamePanel extends JPanel {
             g.setColor(Color.red);
             g.drawString("Score " + score, 170, 350);
             return;
-        }
-        g.setColor(Color.black); // color of background
-        g.fillRect(0, 0, this.getSize().width, this.getSize().height);
-        g.setColor(Color.blue);
-        for (int i = 0; i < 50; i++) {
-            for (int j = 0; j < 50; j++) {
-                if (map.block[i][j]) {
-                    g.fill3DRect(i * 10, j * 10, 10, 10, true);
+        } else if (status == DEAD) {
+            g.setColor(Color.red);
+            g.setFont(new Font("Arial", Font.BOLD, 70));
+            g.drawString("YOU LOSE",75, 100);
+            g.setColor(Color.cyan);
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            g.drawString("Space to restart", 180, 200);
+        } else {
+            g.setColor(Color.black); // color of background
+            g.fillRect(0, 0, this.getSize().width, this.getSize().height);
+            g.setColor(Color.blue);
+            for (int i = 0; i < 50; i++) {
+                for (int j = 0; j < 50; j++) {
+                    if (map.block[i][j]) {
+                        g.fill3DRect(i * 10, j * 10, 10, 10, true);
+                    }
                 }
             }
-        }
 
-        //draw foods
-        g.setColor(Color.yellow);
-        for (Food food : arrayFood.allFood) {
+            //draw foods
             g.setColor(Color.yellow);
-            g.fillOval(food.x, food.y, 10 * food.score, 10 * food.score);
+            for (Food food : arrayFood.allFood) {
+                g.setColor(Color.yellow);
+                g.fillOval(food.x, food.y, 10 * food.score, 10 * food.score);
 
+            }
+            g.setColor(Color.green);
+            for (int i = 0; i < arrayEnemy.allEnemy.size(); i++) {
+                g.drawImage(arrayEnemy.allEnemy.get(i).ic, arrayEnemy.allEnemy.get(i).x, arrayEnemy.allEnemy.get(i).y, 30, 30, this);
+            }
+            drawPacMan(g, x, y);
+            g.setColor(Color.red);
+            g.drawString("Score: \n" + score, 10, 160);
         }
-        g.setColor(Color.green);
-        for (int i = 0; i < arrayEnemy.allEnemy.size(); i++) {
-            g.fillRect(arrayEnemy.allEnemy.get(i).x, arrayEnemy.allEnemy.get(i).y, 30, 30);
-        }
-        drawPacMan(g, x, y);
-        g.setColor(Color.red);
-        g.drawString("Score: \n" + score, 10, 160);
     }
 
     // di chuyen, cap nhap vi tri của pacman 
@@ -159,6 +181,7 @@ class GamePanel extends JPanel {
             status = DEAD;
             sc.playerWAV.stop();
             sc.play(SoundControl.lose);
+
         } else {
             arrayEnemy.update();
             int s = arrayFood.check(x, y); // kiểm tra xem vị trí của pacman có trùng với food nào không 
@@ -211,7 +234,7 @@ class GamePanel extends JPanel {
     }
 
     // lọc những trường hợp không di chuyển được
-    void getAKey(int keyCode) {
+    void getAKey(int keyCode) throws Exception {
 
         switch (keyCode) {
             case KeyEvent.VK_UP:
@@ -234,6 +257,7 @@ class GamePanel extends JPanel {
                     direct = RIGHT;
                 }
                 break;
+            
         }
 
     }

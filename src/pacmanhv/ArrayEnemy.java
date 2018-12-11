@@ -5,7 +5,9 @@
  */
 package pacmanhv;
 
+import java.awt.Image;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -21,10 +23,10 @@ public class ArrayEnemy {
     ArrayEnemy() {
         map = new Map1();
         allEnemy = new ArrayList<>();
-        allEnemy.add(new Enemy(100, 20, 1));
-        allEnemy.add(new Enemy(400, 20, 1));
-        allEnemy.add(new Enemy(20, 400, 1));
-        allEnemy.add(new Enemy(450, 400, 1));
+        allEnemy.add(new Enemy(100, 20, 1,"ghost1.png"));
+        allEnemy.add(new Enemy(400, 20, 1,"ghost2.png"));
+        allEnemy.add(new Enemy(20, 400, 1,"ghost3.png"));
+        allEnemy.add(new Enemy(450, 400, 1,"ghost4.png"));
 
     }
 
@@ -95,11 +97,13 @@ public class ArrayEnemy {
 
         public final int ENEMY = 1;
         public final int FOOD = 2;
+        Image ic;
 
-        public Enemy(int x, int y, int kind) {
+        public Enemy(int x, int y, int kind,String fileImage) {
             this.x = x;
             this.y = y;
             this.kind = kind;
+            ic = new ImageIcon(this.getClass().getResource(fileImage)).getImage();
         }
 
         public int x;

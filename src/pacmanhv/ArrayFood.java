@@ -97,8 +97,8 @@ public class ArrayFood {
         addNew(43, 44, 1);
         addNew(47, 40, 1);
 //cot truoc hang sau, kich co
-    allFood.clear();
-        addNew(1, 1, 1);
+//    allFood.clear();
+//        addNew(1, 1, 1);
 
     }
 
